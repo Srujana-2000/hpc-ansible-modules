@@ -1,0 +1,14 @@
+ancestor: null
+releases:
+
+    release_date: 'To be entered'
+    modules:
+    - description: Helps to get power state of CrayXD 670.
+      name: hpc_get_power_state
+      namespace: ''
+    - description: Fetches the inventory information of the servers.
+      name: hpc_get_system_fw_inv.py
+      namespace: ''
+    - description: This modules helps in the firmware update.
+      name: hpc_update_system_firmware.py
+      namespace: ''
