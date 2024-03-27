@@ -1,0 +1,14 @@
+namespace: hpe
+name: hpc
+version: 1.0.0
+authors:
+  - Srujana <srujana.yasa@hpe.com>
+license: Apache-2.0
+readme: README.md
+description: HPE HPC firmware upgrage Collection for Ansible
+repository: https://github.com/Srujana-2000/hpc-ansible-modules
+documentation: 
+tags:
+  - firmware_update
+homepage: http://hpe.com
+issues: https://github.com/Srujana-2000/hpc-ansible-modules/issues
