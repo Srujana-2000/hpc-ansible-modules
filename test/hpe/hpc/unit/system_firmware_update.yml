@@ -1,0 +1,22 @@
+---
+- hosts: "localhost"
+  gather_facts: false
+  collections:
+    - hpe.hpc
+
+  tasks:
+
+    - name: Running Firmware Update for Cray XD Servers
+      hpc_update_system_firmware:
+        category: Update
+        command: SystemFirmwareUpdate
+        baseuri: "baseuri"
+        username: "bmc_username"
+        password: "bmc_password"
+        output_file_name: "output_file_name"
+        update_target: "target"
+        update_image_path_xd295V: "path"
+        update_image_path_xd225V: "path"
+        update_image_path_xd220V: "path"
+        update_image_path_xd665: "path"
+        update_image_path_xd670: "path"
