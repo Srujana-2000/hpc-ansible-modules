@@ -1,0 +1,17 @@
+---
+- hosts: "localhost"
+  gather_facts: false
+  collections:
+    - hpe.hpc
+
+  tasks:
+
+    - name: Getting Power State of Cray XD670 Server nodes
+      get_power_state:
+        category: Get_Power_State
+        command: Get_PS
+        baseuri: "baseuri"
+        username: "bmc_username"
+        password: "bmc_password"
+        power_state: "off"
+        output_file_name: "output_file"
