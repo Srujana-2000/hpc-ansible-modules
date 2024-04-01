@@ -1,0 +1,5 @@
+---
+- hosts: "localhost"
+- import_playbook: get_system_firmware_inventory.yml
+- import_playbook: power_state_XD670.yml
+- import_playbook: system_firmware_update.yml
