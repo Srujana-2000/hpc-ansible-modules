@@ -68,7 +68,7 @@ The modules interfacing with the array SDKs are released under the Apache-2.0 li
     See the License for the specific language governing permissions and
     limitations under the License.
 
-See [MODULE-LICENSE](https://github.com/hpe-storage/nimble-ansible-modules/blob/master/MODULE-LICENSE) for the full terms.
+See https://github.com/Srujana-2000/hpc-ansible-modules/blob/main/MODULE-LICENSE for the full terms.
 
 ## Code of Conduct
 
