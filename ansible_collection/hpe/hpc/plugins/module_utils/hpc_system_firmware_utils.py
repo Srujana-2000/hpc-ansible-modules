@@ -10,6 +10,7 @@ __metaclass__ = type
 import json
 import subprocess
 import time
+import os
 
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 from ansible.module_utils.urls import open_url
@@ -19,6 +20,20 @@ try:
 except ImportError:
     HAS_REQUESTS_TOOLBELT = False
 
+
+supported_models = ["HPE CRAY XD220V", "HPE CRAY XD225V", "HPE CRAY XD295V", "HPE CRAY XD665", "HPE CRAY XD670"]
+
+# To get inventory, update
+supported_targets = {
+    "HPE CRAY XD220V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD225V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD295V": ["BMC", "BIOS", "MainCPLD", "HDDBPPIC", "PDBPIC"],
+    "HPE CRAY XD665": ["BMC", "BIOS", "RT_NVME", "RT_OTHER", "RT_SA", "PDB", "MainCPLD", "UBM6"],
+    "HPE CRAY XD670": ["BMCImage1", "BMCImage2", "BIOS", "BIOS2", "BPB_CPLD1", "BPB_CPLD2", "MB_CPLD1", "SCM_CPLD1"],
+    }
+
+all_targets = ['BMC', 'BMCImage1', 'BMCImage2', 'BIOS', 'BIOS2', 'MainCPLD',
+               'MB_CPLD1', 'BPB_CPLD1', 'BPB_CPLD2', 'SCM_CPLD1', 'PDB', 'PDBPIC', 'HDDBPPIC', 'RT_NVME', 'RT_OTHER', 'RT_SA', 'UBM6']
 
 REQUESTS_TOOLBELT_REQUIRED = "Requests_toolbelt is required for this module"
 
@@ -134,3 +149,70 @@ class CrayRedfishUtils(RedfishUtils):
             return True
         except Exception:
             return False
+
+    def get_sys_fw_inventory(self, attr):
+        IP = attr.get('baseuri')
+        csv_file_name = attr.get('output_file_name')
+        if not os.path.exists(csv_file_name):
+            f = open(csv_file_name, "w")
+            to_write = """IP_Address, Model, BMC, BMCImage1, BMCImage2, BIOS, BIOS2, MainCPLD, MB_CPLD1,
+                            BPB_CPLD1, BPB_CPLD2, SCM_CPLD1, PDB, PDBPIC, HDDBPPIC, RT_NVME, RT_OTHER, RT_SA, UBM6\n"""
+            f.write(to_write)
+            f.close()
+        model = self.get_model()
+        entry = []
+        entry.append(IP)
+        if model.upper() not in supported_models:
+            entry.append("unsupported_model")
+            for target in all_targets:
+                entry.append("NA")
+        else:
+            entry.append(model)
+            for target in all_targets:
+                if target in supported_targets[model.upper()]:
+                    version = self.get_fw_version(target)
+                    if version.startswith("failed"):
+                        version = "NA"  # "no_comp/no_version"
+                else:
+                    version = "NA"
+                entry.append(version)
+        new_data = ", ".join(entry)
+        return {'ret': True, 'changed': True, 'msg': str(new_data)}
+    
+    def get_PS_CrayXD670(self, attr):
+        IP = attr.get('baseuri')
+        option = attr.get('power_state')
+        csv_file_name = attr.get('output_file_name')
+        if not os.path.exists(csv_file_name):
+            f = open(csv_file_name, "w")
+            to_write = "IP_Address, Model, Power_State\n"
+            f.write(to_write)
+            f.close()
+        model = self.get_model()
+        if model.upper() == "HPE CRAY XD670":
+            power_state = self.power_state()
+            if option.upper() == "NA":
+                lis = [IP, model, power_state]
+            elif option.upper() == "ON":
+                if power_state.upper() == "OFF":
+                    self.power_on()
+                power_state = self.power_state()
+                lis = [IP, model, power_state]
+            elif option.upper() == "OFF":
+                if power_state.upper() == "ON":
+                    self.power_off()
+                power_state = self.power_state()
+                lis = [IP, model, power_state]
+            else:
+                return {'ret': False, 'changed': True, 'msg': 'Must specify the correct required option for power_state'}
+
+        else:
+            lis = [IP, model, "unsupported_model"]
+        new_data = ", ".join(lis)
+        return {'ret': True, 'changed': True, 'msg': str(new_data)}
+
+
+    def target_supported(self, model, target):
+        if target in supported_targets[model.upper()]:
+            return True
+        return False
