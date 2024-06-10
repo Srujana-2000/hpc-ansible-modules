@@ -17,7 +17,6 @@ ansible-galaxy collection install hpe.hpc
 
 - hpc_get_system_fw_inv - Fetches the inventory information of the servers
 - hpc_get_power_state - Helps to get power state of CrayXD 670
-- hpc_update_system_firmware - This modules helps in the firmware update
 
 ## Support
 
